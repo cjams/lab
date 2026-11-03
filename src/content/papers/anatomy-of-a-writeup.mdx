@@ -1,0 +1,85 @@
+---
+title: Anatomy of an Interactive Writeup
+subtitle: A template that exercises every building block on this site.
+date: 2026-11-03
+abstract: >-
+  This page is the kitchen-sink template: an explorable figure, linked views,
+  a scroll-driven canvas scene, math, sidenotes and code. Copy this file to
+  start a new writeup. The data here is synthetic and only illustrates the
+  patterns.
+draft: true
+---
+
+import Figure from '../../components/Figure.astro';
+import Sidenote from '../../components/Sidenote.astro';
+import Scrolly from '../../components/Scrolly.astro';
+import Step from '../../components/Step.astro';
+import TemperatureSoftmax from '../../viz/TemperatureSoftmax.tsx';
+import AttentionMatrix from '../../viz/AttentionMatrix.tsx';
+import EmbeddingCloud from '../../viz/EmbeddingCloud.tsx';
+
+## Explorable figures
+
+A language model turns logits $z_i$ into a distribution with a temperature-scaled
+softmax:<Sidenote>At $T \to 0$ this becomes argmax; as $T \to \infty$ it approaches
+uniform over the vocabulary.</Sidenote>
+
+$$
+p_i = \frac{\exp(z_i / T)}{\sum_j \exp(z_j / T)}
+$$
+
+The equation is easier to understand once you can change $T$ yourself.
+
+<Figure width="wide">
+  <TemperatureSoftmax client:visible />
+  <Fragment slot="caption">
+    Next-character distribution after the prompt "the quick brown f". Drag
+    temperature to see entropy rise and fall, then sample to feel the difference.
+  </Fragment>
+</Figure>
+
+## Linked views
+
+When two views show the same data, hovering in one should light up the other.
+Here the arc diagram and the heatmap both show one head's attention weights.
+
+<Figure width="wide">
+  <AttentionMatrix client:visible />
+  <Fragment slot="caption">
+    Causal attention patterns for four stylized heads. Hover a row of the matrix
+    or a token to choose the query; arcs show where it attends.
+  </Fragment>
+</Figure>
+
+## Scroll-driven scenes
+
+For a narrative over one big visual, pin the graphic and let the text scroll past it.
+Each step below sets a shared value that the canvas listens to.
+
+<Scrolly id="cloud">
+  <EmbeddingCloud slot="graphic" scrollyId="cloud" client:visible />
+  <Step>
+    **Noise.** Four thousand points, drawn from an isotropic Gaussian. Drag to rotate.
+  </Step>
+  <Step>
+    **Clusters.** Each point moves to its group's center. Their colors are still hidden.
+  </Step>
+  <Step>
+    **Labels.** Coloring by group shows that the clusters were real.
+  </Step>
+  <Step>
+    **Structure.** The groups lie along a single one-dimensional curve, ordered.
+  </Step>
+</Scrolly>
+
+## Code and everything else
+
+Plain Markdown still works, including syntax-highlighted code:
+
+```python
+probs = torch.softmax(logits / T, dim=-1)
+next_id = torch.multinomial(probs, num_samples=1)
+```
+
+To publish, set `draft: false` in the frontmatter and add a `substack:` link to
+the companion post.

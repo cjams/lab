@@ -1,0 +1,36 @@
+---
+// Scrollytelling section: a sticky graphic with text steps scrolling past.
+// The active step index is published to `scrollySteps[id]` (lib/store.ts);
+// visualizations in the "graphic" slot subscribe to it.
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+---
+
+<section class="scrolly l-full" data-scrolly={id}>
+  <div class="scrolly-graphic"><slot name="graphic" /></div>
+  <div class="scrolly-steps"><slot /></div>
+</section>
+
+<script>
+  import { scrollySteps } from '../lib/store';
+
+  for (const section of document.querySelectorAll<HTMLElement>('[data-scrolly]')) {
+    const id = section.dataset.scrolly!;
+    const steps = [...section.querySelectorAll<HTMLElement>('.scrolly-steps > .step')];
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const i = steps.indexOf(e.target as HTMLElement);
+          steps.forEach((s, j) => s.classList.toggle('active', j === i));
+          scrollySteps.setKey(id, i);
+        }
+      },
+      // A step is active while it crosses the vertical middle of the viewport.
+      { rootMargin: '-50% 0px -50% 0px' },
+    );
+    steps.forEach((s) => io.observe(s));
+  }
+</script>

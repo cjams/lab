@@ -1,0 +1,13 @@
+---
+// Numbered figure. `width` breaks out of the text column; caption goes in
+// the "caption" slot so it can contain math and links.
+interface Props {
+  width?: 'text' | 'wide' | 'full';
+}
+const { width = 'text' } = Astro.props;
+---
+
+<figure class:list={['fig', width !== 'text' && `l-${width}`]}>
+  <div class="fig-body"><slot /></div>
+  {Astro.slots.has('caption') && <figcaption><slot name="caption" /></figcaption>}
+</figure>

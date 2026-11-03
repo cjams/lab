@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+const papers = (await getCollection('papers', (p) => import.meta.env.DEV || !p.data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<Base title="Lab · Connor Davis">
+  <main class="index">
+    <h1>Lab</h1>
+    <p class="lede">
+      Interactive writeups of AI research. The essays live on
+      <a href="https://www.connorjdavis.com">Substack</a>; the figures you can play with live here.
+    </p>
+    <ol>
+      {
+        papers.map((p) => (
+          <li>
+            <a href={`/papers/${p.id}/`}>
+              <time datetime={p.data.date.toISOString()}>
+                {p.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}
+                {p.data.draft && ' · draft'}
+              </time>
+              <h2>{p.data.title}</h2>
+              {p.data.subtitle && <p>{p.data.subtitle}</p>}
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </main>
+</Base>
