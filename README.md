@@ -48,14 +48,17 @@ Cross-island state goes through nanostores (`src/lib/store.ts`).
 Data: put large precomputed JSON/binary in `public/data/` and `fetch()` it
 from the island, rather than importing it into the bundle.
 
-## Deploy (Cloudflare Pages)
+## Deploy (GitHub Pages)
+
+`.github/workflows/deploy.yml` builds and deploys on every push to `main`.
+
+One-time setup:
 
 1. Push this repo to GitHub.
-2. Cloudflare dashboard → Workers & Pages → Create → Pages → connect the repo.
-   Build command `npm run build`, output directory `dist`.
-3. Pages project → Custom domains → add `lab.connorjdavis.com`. Cloudflare shows
-   a CNAME target (`<project>.pages.dev`).
-4. Route 53 → hosted zone `connorjdavis.com` → create record:
-   `lab` / CNAME / `<project>.pages.dev`. The Substack records (`www`, apex) are untouched.
-
-Every push to `main` deploys; other branches get preview URLs (handy for drafts).
+2. Repo → Settings → Pages → Source: **GitHub Actions**.
+3. Route 53 → hosted zone `connorjdavis.com` → create record:
+   `lab` / CNAME / `<github-username>.github.io`. The Substack records (`www`, apex) are untouched.
+4. Repo → Settings → Pages → Custom domain: `lab.connorjdavis.com`, then tick
+   **Enforce HTTPS** once the certificate is issued (can take up to an hour).
+5. Recommended: GitHub → Settings (account) → Pages → verify `connorjdavis.com`,
+   so no other GitHub user can claim your subdomains.
